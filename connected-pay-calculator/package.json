@@ -5,12 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "react-scripts build",
-    "lint": "eslint .",
+    "build": "vite build",
     "preview": "vite preview",
-    "start": "react-scripts start",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "lint": "eslint .",
+    "test": "vitest"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.2",
