@@ -40,14 +40,21 @@ export async function fetchGSARate(
 
   try {
     const response = await fetch(proxyUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch GSA rates: ${response.statusText}`);
+    }
+
     const result = await response.json();
 
     if (!result || !result.rates || result.rates.length === 0) {
-      throw new Error("No data found for this location/year.");
+      // If no rates found, return standard rates
+      return {
+        lodging: 96,  // Standard lodging rate
+        meals: 59     // Standard M&IE rate
+      };
     }
 
     const rate = result.rates[0];
-    // Extract matching rate for the selected month
     const matchedRate = rate.rate.find((r: any) => {
       const monthMatch = r.months.month.find((monthObj: any) => monthObj.short === month);
       return monthMatch;
@@ -56,15 +63,23 @@ export async function fetchGSARate(
     if (matchedRate) {
       const monthData = matchedRate.months.month.find((m: any) => m.short === month);
       return {
-        lodging: monthData?.value || matchedRate.rate || 0,
-        meals: matchedRate.mie || matchedRate.meals || 0
+        lodging: monthData?.value || matchedRate.rate || 96,
+        meals: matchedRate.mie || matchedRate.meals || 59
       };
     } else {
-      throw new Error(`No data found for the selected month (${month}).`);
+      // If no matching month found, return standard rates
+      return {
+        lodging: 96,
+        meals: 59
+      };
     }
   } catch (error) {
     console.error('Error fetching GSA rate:', error);
-    throw error;
+    // Return standard rates on error
+    return {
+      lodging: 96,
+      meals: 59
+    };
   }
 }
 

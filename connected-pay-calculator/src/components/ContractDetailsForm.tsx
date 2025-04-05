@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { packageCalculator } from '../services/packageCalculator';
+import PackageResults from './PackageResults';
 
 interface ContractDetails {
   // Contract Details
@@ -16,6 +17,33 @@ interface ContractDetails {
   year: string;
 }
 
+interface PayPackageScenario {
+  grossMarginPercent: number;
+  weekly: {
+    grossPay: number;
+    taxablePay: number;
+    stipendPay: number;
+  };
+  hourly: {
+    blendedRate: number;
+    taxableRate: number;
+    stipendRate: number;
+    overtimeRate: number;
+  };
+  total: {
+    contractRevenue: number;
+    contractGrossPay: number;
+    grossPay: number;
+    taxablePay: number;
+    stipendPay: number;
+  };
+}
+
+interface CalculationResult {
+  scenarios: PayPackageScenario[];
+  stateMinimumWage: number;
+}
+
 export default function ContractDetailsForm() {
   const [formData, setFormData] = useState<ContractDetails>({
     billRate: '',
@@ -29,16 +57,25 @@ export default function ContractDetailsForm() {
     year: ''
   });
 
+  const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear previous results when form changes
+    setCalculationResult(null);
+    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsCalculating(true);
+    setError(null);
     
     try {
       const calculationData = {
@@ -54,11 +91,11 @@ export default function ContractDetailsForm() {
       };
 
       const result = await packageCalculator.calculatePackages(calculationData);
-      console.log('Calculation result:', result);
-      // We'll add the display of results in the next step
-    } catch (error) {
-      console.error('Error calculating package:', error);
-      // We'll add error handling UI in the next step
+      setCalculationResult(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while calculating packages');
+    } finally {
+      setIsCalculating(false);
     }
   };
 
@@ -75,8 +112,20 @@ export default function ContractDetailsForm() {
     (_, i) => (currentYear + i).toString()
   );
 
+  // Hours per Week validation
+  if (!formData.hoursPerWeek) {
+    error = 'Hours per week is required';
+  } else {
+    const hours = parseInt(formData.hoursPerWeek);
+    if (hours <= 0) {
+      error = 'Hours must be greater than 0';
+    } else if (hours > 60) {
+      error = 'Hours cannot exceed 60 per week';
+    }
+  }
+
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Contract Details Section */}
         <div>
@@ -101,7 +150,7 @@ export default function ContractDetailsForm() {
             {/* Hours Per Week Input */}
             <div className="space-y-2">
               <label htmlFor="hoursPerWeek" className="block text-sm font-medium text-gray-700">
-                Scheduled Hours Per Week
+                Hours Per Week
               </label>
               <input
                 type="number"
@@ -109,9 +158,16 @@ export default function ContractDetailsForm() {
                 name="hoursPerWeek"
                 value={formData.hoursPerWeek}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                min="1"
+                max="60"
+                className={`w-full px-3 py-2 border rounded-md ${
+                  error ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
               />
+              {error && (
+                <p className="text-sm text-red-600">{error}</p>
+              )}
             </div>
 
             {/* Duration Weeks Input */}
@@ -246,18 +302,36 @@ export default function ContractDetailsForm() {
           </div>
         </div>
 
+        {/* Add error message display */}
+        {error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-600">{error}</p>
+          </div>
+        )}
+
         <div>
           <button
             type="submit"
+            disabled={isCalculating}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4 rounded-xl 
             font-medium tracking-wide shadow-lg hover:from-blue-700 hover:to-blue-600 
             transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Build Pay Package Options
+            {isCalculating ? 'Calculating...' : 'Build Pay Package Options'}
           </button>
         </div>
       </form>
+
+      {/* Results Section */}
+      {(calculationResult || isCalculating) && (
+        <PackageResults 
+          scenarios={calculationResult?.scenarios || []}
+          stateMinimumWage={calculationResult?.stateMinimumWage || 0}
+          isLoading={isCalculating}
+        />
+      )}
     </div>
   );
 } 
