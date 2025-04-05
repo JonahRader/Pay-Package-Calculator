@@ -1,0 +1,4 @@
+[build]
+  base = "connected-pay-calculator"
+  command = "npm run build"
+  publish = "dist" 
