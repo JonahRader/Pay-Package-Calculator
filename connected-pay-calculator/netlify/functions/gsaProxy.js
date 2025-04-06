@@ -2,10 +2,9 @@ const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
   // Get parameters from query string
-  const { city, state, zip, year, month } = event.queryStringParameters;
+  const { city, state, zip, year } = event.queryStringParameters;
 
-  console.log('GSA Proxy received params:', { city, state, zip, year, month });
-  console.log('Using GSA API Key:', process.env.GSA_API_KEY ? 'Present' : 'Missing');
+  console.log('Received parameters:', { city, state, zip, year });
 
   // Define the GSA API endpoint based on the provided parameters
   let apiUrl = `https://api.gsa.gov/travel/perdiem/v2/rates/city/${city}/state/${state}/year/${year}`;
@@ -26,18 +25,18 @@ exports.handler = async function(event, context) {
       }
     });
 
-    if (!response.ok) {
-      console.error('GSA API Error:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      throw new Error(`GSA API returned ${response.status}: ${response.statusText}`);
-    }
-
+    // Parse the response JSON
     const data = await response.json();
-    console.log('GSA API Response:', data);
+
+    // Log the full response for debugging
+    console.log('Full GSA API Response:', JSON.stringify(data, null, 2));
+    console.log('Response structure:', {
+      hasRates: !!data.rates,
+      ratesLength: data.rates?.length,
+      firstRate: data.rates?.[0],
+      mieValue: data.rates?.[0]?.rate?.[0]?.mie,
+      mealsValue: data.rates?.[0]?.rate?.[0]?.meals
+    });
 
     return {
       statusCode: 200,
@@ -55,9 +54,9 @@ exports.handler = async function(event, context) {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({ 
-        message: "Failed to fetch data from GSA API", 
+        message: "Failed to fetch data from GSA API",
         error: error.message,
-        params: { city, state, zip, year, month }
+        params: { city, state, zip, year }
       }),
     };
   }
