@@ -44,6 +44,11 @@ interface CalculationResult {
   stateMinimumWage: number;
 }
 
+interface ValidationErrors {
+  hoursPerWeek?: string;
+  // Add other validation error keys as needed
+}
+
 export default function ContractDetailsForm() {
   const [formData, setFormData] = useState<ContractDetails>({
     billRate: '',
@@ -60,6 +65,7 @@ export default function ContractDetailsForm() {
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -112,17 +118,26 @@ export default function ContractDetailsForm() {
     (_, i) => (currentYear + i).toString()
   );
 
-  // Hours per Week validation
-  if (!formData.hoursPerWeek) {
-    error = 'Hours per week is required';
-  } else {
-    const hours = parseInt(formData.hoursPerWeek);
-    if (hours <= 0) {
-      error = 'Hours must be greater than 0';
-    } else if (hours > 60) {
-      error = 'Hours cannot exceed 60 per week';
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {};
+
+    // Hours per Week validation
+    if (!formData.hoursPerWeek) {
+      errors.hoursPerWeek = 'Hours per week is required';
+    } else {
+      const hours = parseInt(formData.hoursPerWeek);
+      if (hours <= 0) {
+        errors.hoursPerWeek = 'Hours must be greater than 0';
+      } else if (hours > 60) {
+        errors.hoursPerWeek = 'Hours cannot exceed 60 per week';
+      }
     }
-  }
+
+    // ... other validations ...
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   return (
     <div className="max-w-6xl mx-auto">
