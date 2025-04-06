@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { packageCalculator } from '../services/packageCalculator';
 import PackageResults from './PackageResults';
+import { PayPackageScenario } from '../types';
 
 interface ContractDetails {
   // Contract Details
@@ -15,28 +16,6 @@ interface ContractDetails {
   zipCode: string; // optional
   month: string;
   year: string;
-}
-
-interface PayPackageScenario {
-  grossMarginPercent: number;
-  weekly: {
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
-  hourly: {
-    blendedRate: number;
-    taxableRate: number;
-    stipendRate: number;
-    overtimeRate: number;
-  };
-  total: {
-    contractRevenue: number;
-    contractGrossPay: number;
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
 }
 
 interface CalculationResult {
@@ -69,9 +48,9 @@ export default function ContractDetailsForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: ContractDetails) => ({
       ...prev,
-      [name]: value
+      [name as keyof ContractDetails]: value
     }));
     // Clear previous results when form changes
     setCalculationResult(null);
@@ -80,8 +59,14 @@ export default function ContractDetailsForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsCalculating(true);
-    setError(null);
+    
+    console.log('Form data being submitted:', formData);
     
     try {
       const calculationData = {
@@ -95,10 +80,15 @@ export default function ContractDetailsForm() {
         month: formData.month,
         year: formData.year
       };
-
+      
+      console.log('Calculation data:', calculationData);
+      
       const result = await packageCalculator.calculatePackages(calculationData);
+      console.log('Calculator result:', result);
+      
       setCalculationResult(result);
     } catch (err) {
+      console.error('Error in calculation:', err);
       setError(err instanceof Error ? err.message : 'An error occurred while calculating packages');
     } finally {
       setIsCalculating(false);
@@ -173,15 +163,13 @@ export default function ContractDetailsForm() {
                 name="hoursPerWeek"
                 value={formData.hoursPerWeek}
                 onChange={handleChange}
-                min="1"
-                max="60"
                 className={`w-full px-3 py-2 border rounded-md ${
-                  error ? 'border-red-500' : 'border-gray-300'
+                  validationErrors.hoursPerWeek ? 'border-red-500' : 'border-gray-300'
                 }`}
                 required
               />
-              {error && (
-                <p className="text-sm text-red-600">{error}</p>
+              {validationErrors.hoursPerWeek && (
+                <p className="text-sm text-red-600">{validationErrors.hoursPerWeek}</p>
               )}
             </div>
 

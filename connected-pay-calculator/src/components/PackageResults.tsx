@@ -1,24 +1,4 @@
-interface PayPackageScenario {
-  grossMarginPercent: number;
-  weekly: {
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
-  hourly: {
-    blendedRate: number;
-    taxableRate: number;
-    stipendRate: number;
-    overtimeRate: number;
-  };
-  total: {
-    contractRevenue: number;
-    contractGrossPay: number;
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
-}
+import { PayPackageScenario } from '../types';
 
 interface PackageResultsProps {
   scenarios: PayPackageScenario[];
@@ -135,6 +115,43 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax-Free Stipend</span>
                     <span className="font-medium">{formatCurrency(scenario.total.stipendPay)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Internal Breakdown Section */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+                  Internal Breakdown
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Contract Revenue</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalContractRevenue)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Contract Gross Pay</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalContractGrossPay)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Benefits Cost</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.benefitsCost)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payroll Taxes</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.payrollTaxes)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Workers Comp</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.workersComp)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Margin</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalMargin)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Weekly Margin</span>
+                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.weeklyMargin)}</span>
                   </div>
                 </div>
               </div>

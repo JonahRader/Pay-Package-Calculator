@@ -1,4 +1,5 @@
 import { fetchGSARate } from './gsaService';
+import { PayPackageScenario } from '../types';
 
 interface ContractDetails {
   billRate: number;
@@ -10,28 +11,6 @@ interface ContractDetails {
   zipCode?: string;
   month: string;
   year: string;
-}
-
-interface PayPackageScenario {
-  grossMarginPercent: number;
-  weekly: {
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
-  hourly: {
-    blendedRate: number;
-    taxableRate: number;
-    stipendRate: number;
-    overtimeRate: number;
-  };
-  total: {
-    contractRevenue: number;
-    contractGrossPay: number;
-    grossPay: number;
-    taxablePay: number;
-    stipendPay: number;
-  };
 }
 
 interface PayPackageResult {
@@ -159,9 +138,20 @@ class PayPackageCalculator {
     weeklyStipendPay: number
   ): PayPackageScenario {
     const weeklyGrossPay = weeklyTaxablePay + weeklyStipendPay;
-    const blendedHourlyRate = weeklyGrossPay / details.hoursPerWeek;
-    const taxableHourlyRate = weeklyTaxablePay / details.hoursPerWeek;
-    const stipendHourlyRate = weeklyStipendPay / details.hoursPerWeek;
+    
+    // Only include benefits cost if hasBenefits is true
+    const weeklyBenefitsCost = details.hasBenefits ? 80 : 0; // $80 per week if benefits selected, otherwise 0
+    const weeklyPayrollTaxes = weeklyTaxablePay * 0.108; // 10.8% of taxable pay
+    const weeklyWorkersComp = 18; // $18 per week
+    
+    // Contract totals
+    const totalContractRevenue = details.billRate * details.hoursPerWeek * details.durationWeeks;
+    const totalContractGrossPay = weeklyGrossPay * details.durationWeeks;
+    const totalBenefitsCost = weeklyBenefitsCost * details.durationWeeks;
+    const totalPayrollTaxes = weeklyPayrollTaxes * details.durationWeeks;
+    const totalWorkersComp = weeklyWorkersComp * details.durationWeeks;
+    const totalMargin = totalContractRevenue - totalContractGrossPay - totalBenefitsCost - totalPayrollTaxes - totalWorkersComp;
+    const weeklyMargin = totalMargin / details.durationWeeks;
 
     return {
       grossMarginPercent: margin * 100,
@@ -171,17 +161,26 @@ class PayPackageCalculator {
         stipendPay: weeklyStipendPay
       },
       hourly: {
-        blendedRate: blendedHourlyRate,
-        taxableRate: taxableHourlyRate,
-        stipendRate: stipendHourlyRate,
-        overtimeRate: blendedHourlyRate * this.OVERTIME_MULTIPLIER
+        blendedRate: weeklyGrossPay / details.hoursPerWeek,
+        taxableRate: weeklyTaxablePay / details.hoursPerWeek,
+        stipendRate: weeklyStipendPay / details.hoursPerWeek,
+        overtimeRate: (weeklyGrossPay / details.hoursPerWeek) * this.OVERTIME_MULTIPLIER
       },
       total: {
-        contractRevenue: details.billRate * details.hoursPerWeek * details.durationWeeks,
-        contractGrossPay: weeklyGrossPay * details.durationWeeks,
+        contractRevenue: totalContractRevenue,
+        contractGrossPay: totalContractGrossPay,
         grossPay: weeklyGrossPay * details.durationWeeks,
         taxablePay: weeklyTaxablePay * details.durationWeeks,
         stipendPay: weeklyStipendPay * details.durationWeeks
+      },
+      internalBreakdown: {
+        totalContractRevenue,
+        totalContractGrossPay,
+        benefitsCost: totalBenefitsCost,
+        payrollTaxes: totalPayrollTaxes,
+        workersComp: totalWorkersComp,
+        totalMargin,
+        weeklyMargin
       }
     };
   }

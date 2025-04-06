@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 
-exports.handler = async function(event, context) {
+export const handler = async function(event, context) {
   // Get parameters from query string
-  const { city, state, zip, year } = event.queryStringParameters;
+  const { city, state, zip, year, month } = event.queryStringParameters;
+
+  console.log('GSA Proxy received params:', { city, state, zip, year, month });
 
   // Define the GSA API endpoint based on the provided parameters
   let apiUrl = `https://api.gsa.gov/travel/perdiem/v2/rates/city/${city}/state/${state}/year/${year}`;
@@ -11,6 +13,8 @@ exports.handler = async function(event, context) {
   if (zip) {
     apiUrl = `https://api.gsa.gov/travel/perdiem/v2/rates/zip/${zip}/year/${year}`;
   }
+
+  console.log('Calling GSA API:', apiUrl);
 
   try {
     // Fetch data from the GSA API
@@ -21,8 +25,8 @@ exports.handler = async function(event, context) {
       }
     });
 
-    // Parse the response JSON
     const data = await response.json();
+    console.log('GSA API Response:', data);
 
     return {
       statusCode: 200,
@@ -33,10 +37,9 @@ exports.handler = async function(event, context) {
     };
   } catch (error) {
     console.error("Error fetching data:", error);
-
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Failed to fetch data from GSA API" }),
+      body: JSON.stringify({ message: "Failed to fetch data from GSA API", error: error.message }),
     };
   }
 }; 

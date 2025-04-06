@@ -21,7 +21,9 @@ export async function fetchGSARate(
   month: string,
   year: string
 ): Promise<GSARate> {
-  // Convert month name to number (Jan = 1, Feb = 2, etc.)
+  // Log input parameters
+  console.log(`Fetching GSA rate for: ${city}, ${state}, ${zipCode}, ${month}, ${year}`);
+
   const monthNames = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -37,20 +39,26 @@ export async function fetchGSARate(
   } else {
     throw new Error("Please provide either a ZIP code or both city and state.");
   }
+  
+  // Log the URL we're calling
+  console.log(`Calling GSA API with URL: ${proxyUrl}`);
 
   try {
     const response = await fetch(proxyUrl);
+    console.log(`Response status: ${response.status}`);
+
     if (!response.ok) {
       throw new Error(`Failed to fetch GSA rates: ${response.statusText}`);
     }
 
     const result = await response.json();
+    console.log('GSA API Response:', result);
 
     if (!result || !result.rates || result.rates.length === 0) {
-      // If no rates found, return standard rates
+      console.log('No rates found, using standard rates');
       return {
-        lodging: 96,  // Standard lodging rate
-        meals: 59     // Standard M&IE rate
+        lodging: 96,
+        meals: 59
       };
     }
 
@@ -62,12 +70,15 @@ export async function fetchGSARate(
 
     if (matchedRate) {
       const monthData = matchedRate.months.month.find((m: any) => m.short === month);
-      return {
+      const rates = {
         lodging: monthData?.value || matchedRate.rate || 96,
         meals: matchedRate.mie || matchedRate.meals || 59
       };
+      // Log the final rates we're returning
+      console.log('Returning rates:', rates);
+      return rates;
     } else {
-      // If no matching month found, return standard rates
+      console.log('No matching month found, using standard rates');
       return {
         lodging: 96,
         meals: 59
@@ -75,7 +86,6 @@ export async function fetchGSARate(
     }
   } catch (error) {
     console.error('Error fetching GSA rate:', error);
-    // Return standard rates on error
     return {
       lodging: 96,
       meals: 59

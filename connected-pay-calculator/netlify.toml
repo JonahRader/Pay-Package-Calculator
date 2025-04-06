@@ -1,7 +1,13 @@
 [build]
-  base = "connected-pay-calculator"
   command = "npm run build"
-  publish = "build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+  publish = "dist"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/*"
