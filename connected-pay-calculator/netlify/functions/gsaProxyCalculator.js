@@ -1,6 +1,6 @@
-export const handler = async function(event, context) {
-  const fetch = (await import('node-fetch')).default;
-  
+const fetch = require('node-fetch@2');
+
+exports.handler = async function(event, context) {
   // Get parameters from query string
   const { city, state, zip, year } = event.queryStringParameters;
 
@@ -30,13 +30,6 @@ export const handler = async function(event, context) {
 
     // Log the full response for debugging
     console.log('Full GSA API Response:', JSON.stringify(data, null, 2));
-    console.log('Response structure:', {
-      hasRates: !!data.rates,
-      ratesLength: data.rates?.length,
-      firstRate: data.rates?.[0],
-      mieValue: data.rates?.[0]?.rate?.[0]?.mie,
-      mealsValue: data.rates?.[0]?.rate?.[0]?.meals
-    });
 
     return {
       statusCode: 200,
@@ -60,4 +53,4 @@ export const handler = async function(event, context) {
       }),
     };
   }
-}; 
+};
