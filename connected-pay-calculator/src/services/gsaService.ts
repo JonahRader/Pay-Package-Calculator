@@ -33,9 +33,9 @@ export async function fetchGSARate(
   // Construct the API URL
   let proxyUrl = "";
   if (zipCode) {
-    proxyUrl = `/.netlify/functions/gsaProxy?zip=${zipCode}&year=${year}&month=${monthNumber}`;
+    proxyUrl = `/.netlify/functions/gsaProxyCalculator?zip=${zipCode}&year=${year}&month=${monthNumber}`;
   } else if (city && state) {
-    proxyUrl = `/.netlify/functions/gsaProxy?city=${city}&state=${state}&year=${year}&month=${monthNumber}`;
+    proxyUrl = `/.netlify/functions/gsaProxyCalculator?city=${city}&state=${state}&year=${year}&month=${monthNumber}`;
   } else {
     throw new Error("Please provide either a ZIP code or both city and state.");
   }
