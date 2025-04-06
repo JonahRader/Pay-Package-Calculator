@@ -1,10 +1,11 @@
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
-export const handler = async function(event, context) {
+exports.handler = async function(event, context) {
   // Get parameters from query string
   const { city, state, zip, year, month } = event.queryStringParameters;
 
   console.log('GSA Proxy received params:', { city, state, zip, year, month });
+  console.log('Using GSA API Key:', process.env.GSA_API_KEY ? 'Present' : 'Missing');
 
   // Define the GSA API endpoint based on the provided parameters
   let apiUrl = `https://api.gsa.gov/travel/perdiem/v2/rates/city/${city}/state/${state}/year/${year}`;
@@ -25,6 +26,16 @@ export const handler = async function(event, context) {
       }
     });
 
+    if (!response.ok) {
+      console.error('GSA API Error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`GSA API returned ${response.status}: ${response.statusText}`);
+    }
+
     const data = await response.json();
     console.log('GSA API Response:', data);
 
@@ -32,6 +43,7 @@ export const handler = async function(event, context) {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify(data),
     };
@@ -39,7 +51,14 @@ export const handler = async function(event, context) {
     console.error("Error fetching data:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Failed to fetch data from GSA API", error: error.message }),
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ 
+        message: "Failed to fetch data from GSA API", 
+        error: error.message,
+        params: { city, state, zip, year, month }
+      }),
     };
   }
 }; 
