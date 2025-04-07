@@ -1,9 +1,17 @@
 import { PayPackageScenario } from '../types';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { InfoCircle } from 'lucide-react';
 
 interface PackageResultsProps {
   scenarios: PayPackageScenario[];
   stateMinimumWage: number;
-  isLoading?: boolean;
+  isLoading: boolean;
+  details: {
+    city: string;
+    state: string;
+    month: string;
+    year: string;
+  };
 }
 
 const formatCurrency = (amount: number) => {
@@ -15,7 +23,7 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export default function PackageResults({ scenarios, stateMinimumWage, isLoading = false }: PackageResultsProps) {
+export default function PackageResults({ scenarios, stateMinimumWage, isLoading = false, details }: PackageResultsProps) {
   if (isLoading) {
     return (
       <div className="mt-8 text-center">
@@ -30,31 +38,78 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
   }
 
   return (
-    <div className="mt-8 space-y-6">
+    <div className="mt-8 space-y-8">
+      {/* Stipend Calculation Section with updated messaging */}
+      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-blue-900">Stipend Calculation Breakdown</h3>
+          <div className="text-sm text-blue-700">
+            <span className="font-medium">{details.city}, {details.state}</span>
+            <span className="mx-2">•</span>
+            <span>{details.month} {details.year}</span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex items-center space-x-3 mb-2">
+              <span className="text-2xl">🏠</span>
+              <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Daily Lodging</h4>
+            </div>
+            <p className="text-2xl font-semibold text-blue-600">{formatCurrency(scenarios[0].stipendBreakdown.dailyLodging)}</p>
+            {scenarios[0].stipendBreakdown.isStandardRate && (
+              <p className="text-xs text-gray-500 mt-2">Using standard rate for this location</p>
+            )}
+          </div>
+          <div className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex items-center space-x-3 mb-2">
+              <span className="text-2xl">🍽️</span>
+              <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Daily M&IE</h4>
+            </div>
+            <p className="text-2xl font-semibold text-blue-600">{formatCurrency(scenarios[0].stipendBreakdown.dailyMeals)}</p>
+            {scenarios[0].stipendBreakdown.isStandardRate && (
+              <p className="text-xs text-gray-500 mt-2">Using standard rate for this location</p>
+            )}
+          </div>
+          <div className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow duration-200">
+            <div className="flex items-center space-x-3 mb-2">
+              <span className="text-2xl">💰</span>
+              <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Weekly Stipend</h4>
+            </div>
+            <p className="text-2xl font-semibold text-blue-600">{formatCurrency(scenarios[0].stipendBreakdown.weeklyStipend)}</p>
+            <div className="mt-2 space-y-1">
+              <p className="text-xs text-gray-600">
+                <span className="font-medium">Full-Time (30+ hours/week):</span> Eligible for full weekly amount
+              </p>
+              <p className="text-xs text-gray-500">
+                Part-time stipends are prorated based on scheduled hours
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <h2 className="text-2xl font-semibold text-gray-800">Pay Package Options</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {scenarios.map((scenario, index) => (
           <div 
             key={scenario.grossMarginPercent}
-            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 
-              ${index === 0 ? 'border-blue-500 ring-2 ring-blue-500' : 'border-transparent'}`}
+            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transform transition-all duration-200 hover:shadow-xl
+              ${index === 1 ? 'border-blue-500 ring-2 ring-blue-500' : 'border-transparent'}`}
           >
             {/* Header */}
-            <div className={`px-6 py-4 ${index === 0 ? 'bg-blue-500' : 'bg-gray-50'}`}>
-              <h3 className={`text-xl font-semibold ${index === 0 ? 'text-white' : 'text-gray-800'}`}>
-                {index === 0 ? 'Recommended' : 'Option'} {index + 1}
+            <div className={`px-6 py-4 ${index === 1 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gray-50'}`}>
+              <h3 className={`text-xl font-semibold ${index === 1 ? 'text-white' : 'text-gray-800'}`}>
+                Option {index + 1}
               </h3>
-              <p className={`text-sm ${index === 0 ? 'text-white/90' : 'text-gray-600'}`}>
-                {scenario.grossMarginPercent}% Margin
-              </p>
             </div>
 
             {/* Content */}
             <div className="p-6 space-y-6">
               {/* Weekly Section */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+              <div className="pb-4 border-b border-gray-100">
+                <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 border-b-2 border-blue-500 pb-1 text-center">
                   Weekly Breakdown
                 </h4>
                 <div className="space-y-2">
@@ -66,41 +121,43 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
                     <span className="text-gray-600">Taxable Pay</span>
                     <span className="font-medium">{formatCurrency(scenario.weekly.taxablePay)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Tax-Free Stipend</span>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <span className="text-gray-600">Tax-Free Stipend</span>
+                    </div>
                     <span className="font-medium">{formatCurrency(scenario.weekly.stipendPay)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Hourly Section */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+              <div className="pb-4 border-b border-gray-100">
+                <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 border-b-2 border-blue-500 pb-1 text-center">
                   Hourly Rates
                 </h4>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Blended Rate</span>
-                    <span className="font-medium">{formatCurrency(scenario.hourly.blendedRate)}/hr</span>
+                  <div className="flex justify-between items-center">
+                    <span>Blended Rate</span>
+                    <span>{formatCurrency(scenario.hourly.blendedRate)}/hr</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Taxable Rate</span>
-                    <span className="font-medium">{formatCurrency(scenario.hourly.taxableRate)}/hr</span>
+                  <div className="flex justify-between items-center">
+                    <span>Taxable Rate</span>
+                    <span>{formatCurrency(scenario.hourly.taxableRate)}/hr</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Stipend Rate</span>
-                    <span className="font-medium">{formatCurrency(scenario.hourly.stipendRate)}/hr</span>
+                  <div className="flex justify-between items-center">
+                    <span>Stipend Rate</span>
+                    <span>{formatCurrency(scenario.hourly.stipendRate)}/hr</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Overtime Rate</span>
-                    <span className="font-medium">{formatCurrency(scenario.hourly.overtimeRate)}/hr</span>
+                  <div className="flex justify-between items-center">
+                    <span>Overtime Rate</span>
+                    <span>{formatCurrency(scenario.hourly.overtimeRate)}/hr</span>
                   </div>
                 </div>
               </div>
 
               {/* Contract Total Section */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+              <div className="pb-4 border-b border-gray-100">
+                <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 border-b-2 border-blue-500 pb-1 text-center">
                   Contract Totals
                 </h4>
                 <div className="space-y-2">
@@ -119,39 +176,27 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
                 </div>
               </div>
 
-              {/* Internal Breakdown Section */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+              {/* Internal Breakdown Section with fixed alignment */}
+              <div className="pb-4">
+                <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3 border-b-2 border-blue-500 pb-1 text-center">
                   Internal Breakdown
                 </h4>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Contract Revenue</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalContractRevenue)}</span>
+                  <div className="grid grid-cols-2 items-center">
+                    <span className="text-gray-600">Contract Revenue</span>
+                    <span className="font-medium text-right">{formatCurrency(scenario.internalBreakdown.totalContractRevenue)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Contract Gross Pay</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalContractGrossPay)}</span>
+                  <div className="grid grid-cols-2 items-center">
+                    <span className="text-gray-600">Total Pay</span>
+                    <span className="font-medium text-right">{formatCurrency(scenario.internalBreakdown.totalContractGrossPay)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Benefits Cost</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.benefitsCost)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payroll Taxes</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.payrollTaxes)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Workers Comp</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.workersComp)}</span>
-                  </div>
-                  <div className="flex justify-between">
+                  <div className="grid grid-cols-2 items-center">
                     <span className="text-gray-600">Total Margin</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.totalMargin)}</span>
+                    <span className="font-medium text-right">{formatCurrency(scenario.internalBreakdown.totalMargin)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="grid grid-cols-2 items-center">
                     <span className="text-gray-600">Weekly Margin</span>
-                    <span className="font-medium">{formatCurrency(scenario.internalBreakdown.weeklyMargin)}</span>
+                    <span className="font-medium text-right">{formatCurrency(scenario.internalBreakdown.weeklyMargin)}</span>
                   </div>
                 </div>
               </div>

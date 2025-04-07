@@ -24,10 +24,4 @@ export interface PayPackageScenario {
     totalMargin: number;
     weeklyMargin: number;
   };
-  stipendBreakdown: {
-    dailyLodging: number;
-    dailyMeals: number;
-    weeklyStipend: number;
-    isStandardRate: boolean;
-  };
 } 

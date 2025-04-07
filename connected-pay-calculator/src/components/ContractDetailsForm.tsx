@@ -8,9 +8,6 @@ interface ContractDetails {
   billRate: string;
   hoursPerWeek: string;
   durationWeeks: string;
-  hasBenefits: string;  // Using string for dropdown: 'yes' or 'no'
-  
-  // Location Details
   city: string;
   state: string; // 2-letter
   zipCode: string; // optional
@@ -33,7 +30,6 @@ export default function ContractDetailsForm() {
     billRate: '',
     hoursPerWeek: '',
     durationWeeks: '',
-    hasBenefits: '',  // Empty string as initial value for select
     city: '',
     state: '',
     zipCode: '',
@@ -73,7 +69,6 @@ export default function ContractDetailsForm() {
         billRate: parseFloat(formData.billRate),
         hoursPerWeek: parseInt(formData.hoursPerWeek),
         durationWeeks: parseInt(formData.durationWeeks),
-        hasBenefits: formData.hasBenefits === 'yes',
         city: formData.city,
         state: formData.state,
         zipCode: formData.zipCode,
@@ -187,25 +182,6 @@ export default function ContractDetailsForm() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
               />
-            </div>
-
-            {/* Benefits Dropdown */}
-            <div className="space-y-2">
-              <label htmlFor="hasBenefits" className="block text-sm font-medium text-gray-700">
-                Accepting Benefits?
-              </label>
-              <select
-                id="hasBenefits"
-                name="hasBenefits"
-                value={formData.hasBenefits}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="">Select Option</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
             </div>
           </div>
         </div>
@@ -333,6 +309,12 @@ export default function ContractDetailsForm() {
           scenarios={calculationResult?.scenarios || []}
           stateMinimumWage={calculationResult?.stateMinimumWage || 0}
           isLoading={isCalculating}
+          details={{
+            city: formData.city,
+            state: formData.state,
+            month: formData.month,
+            year: formData.year
+          }}
         />
       )}
     </div>

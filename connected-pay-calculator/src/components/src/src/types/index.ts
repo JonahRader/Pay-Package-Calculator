@@ -21,9 +21,6 @@ export interface PayPackageScenario {
   internalBreakdown: {
     totalContractRevenue: number;
     totalContractGrossPay: number;
-    benefitsCost: number;
-    payrollTaxes: number;
-    workersComp: number;
     totalMargin: number;
     weeklyMargin: number;
   };

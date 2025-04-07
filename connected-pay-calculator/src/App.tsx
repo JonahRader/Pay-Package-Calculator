@@ -7,7 +7,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header Section */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="w-full px-8 py-6">
           <div className="flex flex-col items-center space-y-6">
             {/* Logo only */}
             <div className="flex items-center">
@@ -29,7 +29,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="w-full px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <ContractDetailsForm />
         </div>
