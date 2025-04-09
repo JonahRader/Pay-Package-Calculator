@@ -144,8 +144,17 @@ class PayPackageCalculator {
       }
       
       // Calculate hourly rates
-      const taxableRate = baseWeeklyTaxable / 40; // Will never be below min wage
-      const stipendRate = actualWeeklyStipend / 40;
+      let taxableRate, stipendRate;
+
+      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
+        // For 30-39 hours: Recalculate hourly rates based on actual hours
+        stipendRate = actualWeeklyStipend / details.hoursPerWeek;
+        taxableRate = blendedRate - stipendRate; // Ensure taxable + stipend = blended
+      } else {
+        // For 40+ hours or <30 hours: Keep original calculation
+        taxableRate = baseWeeklyTaxable / 40;
+        stipendRate = actualWeeklyStipend / 40;
+      }
       
       // Handle actual hours worked
       const regularHours = Math.min(40, details.hoursPerWeek);
