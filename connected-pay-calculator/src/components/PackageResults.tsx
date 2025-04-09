@@ -95,17 +95,26 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
         {scenarios.map((scenario, index) => (
           <div 
             key={scenario.grossMarginPercent}
-            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transform transition-all duration-200 hover:shadow-xl hover:border-blue-300
-              ${index === 1 ? 'border-blue-500 ring-2 ring-blue-500' : 'border-transparent'}`}
+            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 transform transition-all duration-200 
+              ${index === 1 ? 'border-blue-500 ring-2 ring-blue-500' : 'border-transparent hover:border-blue-400'} 
+              hover:shadow-2xl hover:-translate-y-1`}
           >
             {/* Header */}
-            <div className={`px-6 py-4 ${index === 1 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gray-50 hover:bg-blue-50 transition-colors duration-200'}`}>
-              <h3 className={`text-xl font-semibold ${index === 1 ? 'text-white' : 'text-gray-800'}`}>
+            <div className={`px-6 py-4 relative overflow-hidden group
+              ${index === 1 ? 'bg-gradient-to-r from-blue-500 to-blue-600' : 'bg-gray-50'}`}
+            >
+              <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-90 transition-opacity duration-200"></div>
+              
+              <h3 className={`text-xl font-semibold relative z-10 
+                ${index === 1 ? 'text-white' : 'text-gray-800 group-hover:text-white'}`}>
                 Option {index + 1}
               </h3>
-              <p className={`text-sm mt-1 ${index === 1 ? 'text-blue-100' : 'text-gray-500'}`}>
+              
+              {/* Margin that appears on hover */}
+              <div className="absolute right-4 top-4 bg-blue-800 text-white text-sm font-bold py-1 px-2 rounded-full 
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
                 {scenario.grossMarginPercent}% Margin
-              </p>
+              </div>
             </div>
 
             {/* Content */}

@@ -143,7 +143,7 @@ class PayPackageCalculator {
         actualWeeklyStipend = baseWeeklyGross - baseWeeklyTaxable;
       }
       
-      // Calculate hourly rates
+      // Calculate standard hourly rates
       const taxableRate = baseWeeklyTaxable / 40; // Will never be below min wage
       const stipendRate = actualWeeklyStipend / 40;
       
@@ -151,37 +151,44 @@ class PayPackageCalculator {
       const regularHours = Math.min(40, details.hoursPerWeek);
       const overtimeHours = Math.max(0, details.hoursPerWeek - 40);
       
-      // Special handling for 30-39 hours
-      let effectiveStipendRate = stipendRate;
-      let effectiveTaxableRate = taxableRate;
-      
-      // ONLY adjust calculations for 30-39 hours range
-      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
-        effectiveStipendRate = actualWeeklyStipend / details.hoursPerWeek;
-        effectiveTaxableRate = blendedRate - effectiveStipendRate;
-      }
-      
-      // Calculate weekly pay
+      // Calculate weekly pay for non 30-39 hour range
       let weeklyTaxablePay;
-      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
-        // For 30-39 hours, use the adjusted rates
-        weeklyTaxablePay = effectiveTaxableRate * regularHours;
-      } else {
-        // For all other cases, use the original calculation
-        const regularTaxablePay = taxableRate * regularHours;
-        const overtimePay = overtimeRate * overtimeHours;
-        weeklyTaxablePay = regularTaxablePay + overtimePay;
-      }
+      let weeklyGrossPay;
+      let displayTaxableRate = taxableRate;
+      let displayStipendRate = stipendRate;
       
       // Prorate stipend if part time
       const finalWeeklyStipend = (details.hoursPerWeek >= 30) ? actualWeeklyStipend 
-                                                              : (actualWeeklyStipend * details.hoursPerWeek / 40);
+                                                            : (actualWeeklyStipend * details.hoursPerWeek / 40);
       
-      // Calculate gross pay based on your formula for 30-39 hours
-      let weeklyGrossPay;
+      // SPECIFICALLY handle the 30-39 hour case
       if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
-        weeklyGrossPay = blendedRate * details.hoursPerWeek;
+        // Recalculate hourly rates for display only
+        displayStipendRate = finalWeeklyStipend / details.hoursPerWeek;
+        
+        // Important: Check if the recalculated taxable rate would be below minimum wage
+        const newTaxableRate = blendedRate - displayStipendRate;
+        
+        // If below minimum wage, adjust properly
+        if (newTaxableRate < stateMinWage) {
+          displayTaxableRate = stateMinWage;
+          displayStipendRate = blendedRate - stateMinWage;
+          
+          // Recalculate stipend based on adjusted rate
+          const adjustedStipend = displayStipendRate * details.hoursPerWeek;
+          weeklyTaxablePay = displayTaxableRate * details.hoursPerWeek;
+          weeklyGrossPay = weeklyTaxablePay + adjustedStipend;
+        } else {
+          // Not below minimum wage, use the calculated rates
+          displayTaxableRate = newTaxableRate;
+          weeklyTaxablePay = displayTaxableRate * details.hoursPerWeek;
+          weeklyGrossPay = blendedRate * details.hoursPerWeek;
+        }
       } else {
+        // Standard calculation for hours <= 29 or >= 40
+        const regularTaxablePay = taxableRate * regularHours;
+        const overtimePay = overtimeRate * overtimeHours;
+        weeklyTaxablePay = regularTaxablePay + overtimePay;
         weeklyGrossPay = weeklyTaxablePay + finalWeeklyStipend;
       }
 
@@ -194,8 +201,8 @@ class PayPackageCalculator {
         },
         hourly: {
           blendedRate: blendedRate,
-          taxableRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? effectiveTaxableRate : taxableRate,
-          stipendRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? effectiveStipendRate : stipendRate,
+          taxableRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? displayTaxableRate : taxableRate,
+          stipendRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? displayStipendRate : stipendRate,
           overtimeRate: overtimeRate
         },
         total: {
