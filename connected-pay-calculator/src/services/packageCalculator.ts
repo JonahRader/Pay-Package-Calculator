@@ -144,32 +144,46 @@ class PayPackageCalculator {
       }
       
       // Calculate hourly rates
-      let taxableRate, stipendRate;
-
-      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
-        // For 30-39 hours: Recalculate hourly rates based on actual hours
-        stipendRate = actualWeeklyStipend / details.hoursPerWeek;
-        taxableRate = blendedRate - stipendRate; // Ensure taxable + stipend = blended
-      } else {
-        // For 40+ hours or <30 hours: Keep original calculation
-        taxableRate = baseWeeklyTaxable / 40;
-        stipendRate = actualWeeklyStipend / 40;
-      }
+      const taxableRate = baseWeeklyTaxable / 40; // Will never be below min wage
+      const stipendRate = actualWeeklyStipend / 40;
       
       // Handle actual hours worked
       const regularHours = Math.min(40, details.hoursPerWeek);
       const overtimeHours = Math.max(0, details.hoursPerWeek - 40);
       
+      // Special handling for 30-39 hours
+      let effectiveStipendRate = stipendRate;
+      let effectiveTaxableRate = taxableRate;
+      
+      // ONLY adjust calculations for 30-39 hours range
+      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
+        effectiveStipendRate = actualWeeklyStipend / details.hoursPerWeek;
+        effectiveTaxableRate = blendedRate - effectiveStipendRate;
+      }
+      
       // Calculate weekly pay
-      const regularTaxablePay = taxableRate * regularHours;
-      const overtimePay = overtimeRate * overtimeHours;
-      const weeklyTaxablePay = regularTaxablePay + overtimePay;
+      let weeklyTaxablePay;
+      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
+        // For 30-39 hours, use the adjusted rates
+        weeklyTaxablePay = effectiveTaxableRate * regularHours;
+      } else {
+        // For all other cases, use the original calculation
+        const regularTaxablePay = taxableRate * regularHours;
+        const overtimePay = overtimeRate * overtimeHours;
+        weeklyTaxablePay = regularTaxablePay + overtimePay;
+      }
       
       // Prorate stipend if part time
       const finalWeeklyStipend = (details.hoursPerWeek >= 30) ? actualWeeklyStipend 
                                                               : (actualWeeklyStipend * details.hoursPerWeek / 40);
       
-      const weeklyGrossPay = weeklyTaxablePay + finalWeeklyStipend;
+      // Calculate gross pay based on your formula for 30-39 hours
+      let weeklyGrossPay;
+      if (details.hoursPerWeek >= 30 && details.hoursPerWeek < 40) {
+        weeklyGrossPay = blendedRate * details.hoursPerWeek;
+      } else {
+        weeklyGrossPay = weeklyTaxablePay + finalWeeklyStipend;
+      }
 
       return {
         grossMarginPercent: margin * 100,
@@ -180,8 +194,8 @@ class PayPackageCalculator {
         },
         hourly: {
           blendedRate: blendedRate,
-          taxableRate: taxableRate,
-          stipendRate: stipendRate,
+          taxableRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? effectiveTaxableRate : taxableRate,
+          stipendRate: details.hoursPerWeek >= 30 && details.hoursPerWeek < 40 ? effectiveStipendRate : stipendRate,
           overtimeRate: overtimeRate
         },
         total: {
