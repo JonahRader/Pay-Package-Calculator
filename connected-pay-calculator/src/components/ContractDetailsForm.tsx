@@ -23,6 +23,7 @@ interface CalculationResult {
 
 interface ValidationErrors {
   hoursPerWeek?: string;
+  isLocalContract?: string;
   // Add other validation error keys as needed
 }
 
@@ -76,7 +77,7 @@ export default function ContractDetailsForm() {
         zipCode: formData.zipCode,
         month: formData.month,
         year: formData.year,
-        isLocalContract: formData.isLocalContract === 'Yes' // Convert to boolean
+        isLocalContract: formData.isLocalContract === 'Yes' // This correctly converts string to boolean
       };
       
       console.log('Calculation data:', calculationData);
@@ -194,12 +195,12 @@ export default function ContractDetailsForm() {
           </div>
         </div>
 
-        {/* Location Details Section */}
+        {/* Contract Location Details Section - Updated layout for perfect alignment */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Contract Location Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* First Column */}
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
+            {/* Left Column - City, State, Zip */}
+            <div className="flex flex-col space-y-4">
               <div className="space-y-2">
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700">
                   City
@@ -246,8 +247,8 @@ export default function ContractDetailsForm() {
               </div>
             </div>
 
-            {/* Second Column */}
-            <div className="space-y-4">
+            {/* Right Column - Month, Year, Local Contract */}
+            <div className="flex flex-col space-y-4">
               <div className="space-y-2">
                 <label htmlFor="month" className="block text-sm font-medium text-gray-700">
                   Month
@@ -295,9 +296,7 @@ export default function ContractDetailsForm() {
                   name="isLocalContract"
                   value={formData.isLocalContract}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md ${
-                    validationErrors.isLocalContract ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 >
                   <option value="">Select</option>
