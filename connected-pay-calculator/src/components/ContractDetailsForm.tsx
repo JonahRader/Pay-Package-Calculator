@@ -195,118 +195,121 @@ export default function ContractDetailsForm() {
           </div>
         </div>
 
-        {/* Contract Location Details Section - Updated layout for perfect alignment */}
+        {/* Contract Location Details Section */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Contract Location Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4">
-            {/* Left Column - City, State, Zip */}
-            <div className="flex flex-col space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="city" className="block text-sm font-medium text-gray-700">
-                  City
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="state" className="block text-sm font-medium text-gray-700">
-                  State (2-Letter)
-                </label>
-                <input
-                  type="text"
-                  id="state"
-                  name="state"
-                  value={formData.state.toUpperCase()}
-                  onChange={handleChange}
-                  maxLength={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md uppercase"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
-                  Zip Code (Optional)
-                </label>
-                <input
-                  type="text"
-                  id="zipCode"
-                  name="zipCode"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
+          
+          {/* Use grid with explicit column sizing and styling */}
+          <div className="grid grid-cols-2 gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            
+            {/* City Field */}
+            <div className="field-container">
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                City
+              </label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px]"
+                required
+              />
             </div>
-
-            {/* Right Column - Month, Year, Local Contract */}
-            <div className="flex flex-col space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="month" className="block text-sm font-medium text-gray-700">
-                  Month
-                </label>
-                <select
-                  id="month"
-                  name="month"
-                  value={formData.month}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="">Select Month</option>
-                  {months.map(month => (
-                    <option key={month} value={month}>{month}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2 mt-[2px]">
-                <label htmlFor="year" className="block text-sm font-medium text-gray-700">
-                  Year
-                </label>
-                <select
-                  id="year"
-                  name="year"
-                  value={formData.year}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="">Select Year</option>
-                  {years.map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2 mt-[2px]">
-                <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700">
-                  Is this a Local Contract Opportunity?
-                </label>
-                <select
-                  id="isLocalContract"
-                  name="isLocalContract"
-                  value={formData.isLocalContract}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-                {validationErrors.isLocalContract && (
-                  <p className="text-sm text-red-600">{validationErrors.isLocalContract}</p>
-                )}
-              </div>
+            
+            {/* Month Field - exact same styling as inputs */}
+            <div className="field-container">
+              <label htmlFor="month" className="block text-sm font-medium text-gray-700 mb-1">
+                Month
+              </label>
+              <select
+                id="month"
+                name="month"
+                value={formData.month}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px] appearance-none"
+                style={{ WebkitAppearance: "none" }}
+                required
+              >
+                <option value="">Select Month</option>
+                {months.map(month => (
+                  <option key={month} value={month}>{month}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* State Field */}
+            <div className="field-container">
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                State (2-Letter)
+              </label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                value={formData.state.toUpperCase()}
+                onChange={handleChange}
+                maxLength={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px]"
+                required
+              />
+            </div>
+            
+            {/* Year Field - exact same styling as inputs */}
+            <div className="field-container">
+              <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-1">
+                Year
+              </label>
+              <select
+                id="year"
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px] appearance-none"
+                style={{ WebkitAppearance: "none" }}
+                required
+              >
+                <option value="">Select Year</option>
+                {years.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Zip Code Field */}
+            <div className="field-container">
+              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-1">
+                Zip Code (Optional)
+              </label>
+              <input
+                type="text"
+                id="zipCode"
+                name="zipCode"
+                value={formData.zipCode}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px]"
+              />
+            </div>
+            
+            {/* Local Contract Field - exact same styling as inputs */}
+            <div className="field-container">
+              <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700 mb-1">
+                Is this a Local Contract Opportunity?
+              </label>
+              <select
+                id="isLocalContract"
+                name="isLocalContract"
+                value={formData.isLocalContract}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md h-[38px] appearance-none"
+                style={{ WebkitAppearance: "none" }}
+                required
+              >
+                <option value="">Select</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
             </div>
           </div>
         </div>
