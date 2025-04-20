@@ -13,6 +13,7 @@ interface ContractDetails {
   zipCode: string; // optional
   month: string;
   year: string;
+  isLocalContract: string; // Added new field
 }
 
 interface CalculationResult {
@@ -34,7 +35,8 @@ export default function ContractDetailsForm() {
     state: '',
     zipCode: '',
     month: '',
-    year: ''
+    year: '',
+    isLocalContract: 'No' // Default to No
   });
 
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
@@ -73,7 +75,8 @@ export default function ContractDetailsForm() {
         state: formData.state,
         zipCode: formData.zipCode,
         month: formData.month,
-        year: formData.year
+        year: formData.year,
+        isLocalContract: formData.isLocalContract === 'Yes' // Convert to boolean
       };
       
       console.log('Calculation data:', calculationData);
@@ -166,6 +169,24 @@ export default function ContractDetailsForm() {
               {validationErrors.hoursPerWeek && (
                 <p className="text-sm text-red-600">{validationErrors.hoursPerWeek}</p>
               )}
+            </div>
+
+            {/* Is Local Contract Dropdown */}
+            <div className="space-y-2">
+              <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700">
+                Is this a Local Contract Opportunity?
+              </label>
+              <select
+                id="isLocalContract"
+                name="isLocalContract"
+                value={formData.isLocalContract}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
             </div>
 
             {/* Duration Weeks Input */}

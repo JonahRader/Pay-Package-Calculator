@@ -10,6 +10,7 @@ interface ContractDetails {
   zipCode?: string;
   month: string;
   year: string;
+  isLocalContract: boolean;
 }
 
 interface PayPackageResult {
@@ -120,7 +121,9 @@ class PayPackageCalculator {
       isStandardRate = true;
     }
 
-    const weeklyStipend = (dailyLodging + dailyMeals) * 7;
+    const weeklyStipend = details.isLocalContract 
+      ? (dailyMeals * 7) // Only include meals for local contracts
+      : (dailyLodging + dailyMeals) * 7; // Both for non-local contracts
 
     const scenarios = this.MARGIN_SCENARIOS.map(margin => {
       // These stay constant regardless of hours
@@ -219,10 +222,11 @@ class PayPackageCalculator {
           weeklyMargin: (details.billRate * details.hoursPerWeek) - weeklyGrossPay
         },
         stipendBreakdown: {
-          dailyLodging,
+          dailyLodging: details.isLocalContract ? 0 : dailyLodging, // Zero for local contracts
           dailyMeals,
           weeklyStipend,
-          isStandardRate
+          isStandardRate,
+          isLocalContract: details.isLocalContract // Include this flag for UI
         }
       };
     });

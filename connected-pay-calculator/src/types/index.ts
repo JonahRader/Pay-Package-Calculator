@@ -29,5 +29,6 @@ export interface PayPackageScenario {
     dailyMeals: number;
     weeklyStipend: number;
     isStandardRate: boolean;
+    isLocalContract: boolean;
   };
 } 
