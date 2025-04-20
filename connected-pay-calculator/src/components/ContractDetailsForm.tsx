@@ -175,6 +175,22 @@ export default function ContractDetailsForm() {
                 <p className="text-sm text-red-600">{validationErrors.hoursPerWeek}</p>
               )}
             </div>
+
+            {/* Contract Duration Input */}
+            <div className="space-y-2">
+              <label htmlFor="durationWeeks" className="block text-sm font-medium text-gray-700">
+                Contract Duration (Weeks)
+              </label>
+              <input
+                type="number"
+                id="durationWeeks"
+                name="durationWeeks"
+                value={formData.durationWeeks}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
           </div>
         </div>
 
