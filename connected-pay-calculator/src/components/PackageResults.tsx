@@ -132,20 +132,18 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
             >
               <div className="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-90 transition-opacity duration-200"></div>
               
-              {/* Center the title better */}
-              <div className="flex flex-col items-center relative z-10">
-                <h3 className={`text-xl font-semibold 
-                  ${index === 1 ? 'text-white' : 'text-gray-800 group-hover:text-white'}`}>
-                  Option {index + 1}
-                </h3>
-                
-                {/* Margin bubble - centered and better positioned */}
-                <div className="absolute right-0 top-0 bg-blue-800 text-white text-sm font-bold py-1 px-3 rounded-full 
-                  flex flex-col items-center justify-center text-center min-w-[60px]
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                  <span>{scenario.grossMarginPercent}%</span>
-                  <span className="text-xs">Margin</span>
-                </div>
+              {/* Center the title */}
+              <h3 className={`text-xl font-semibold relative z-10 text-center
+                ${index === 1 ? 'text-white' : 'text-gray-800 group-hover:text-white'}`}>
+                Option {index + 1}
+              </h3>
+              
+              {/* Margin bubble - now positioned at the top left corner */}
+              <div className="absolute left-2 top-2 bg-blue-800 text-white text-sm font-bold py-1 px-2 rounded-full 
+                flex flex-col items-center justify-center text-center min-w-[50px]
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <span>{scenario.grossMarginPercent}%</span>
+                <span className="text-xs">Margin</span>
               </div>
             </div>
 
