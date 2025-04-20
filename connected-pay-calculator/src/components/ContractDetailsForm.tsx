@@ -36,7 +36,7 @@ export default function ContractDetailsForm() {
     zipCode: '',
     month: '',
     year: '',
-    isLocalContract: 'No' // Default to No
+    isLocalContract: '' // Changed from 'No' to empty string
   });
 
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
@@ -123,6 +123,11 @@ export default function ContractDetailsForm() {
 
     // ... other validations ...
 
+    // Add validation for isLocalContract
+    if (!formData.isLocalContract) {
+      errors.isLocalContract = 'Please select whether this is a local contract';
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -169,40 +174,6 @@ export default function ContractDetailsForm() {
               {validationErrors.hoursPerWeek && (
                 <p className="text-sm text-red-600">{validationErrors.hoursPerWeek}</p>
               )}
-            </div>
-
-            {/* Is Local Contract Dropdown */}
-            <div className="space-y-2">
-              <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700">
-                Is this a Local Contract Opportunity?
-              </label>
-              <select
-                id="isLocalContract"
-                name="isLocalContract"
-                value={formData.isLocalContract}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-
-            {/* Duration Weeks Input */}
-            <div className="space-y-2">
-              <label htmlFor="durationWeeks" className="block text-sm font-medium text-gray-700">
-                Contract Duration (Weeks)
-              </label>
-              <input
-                type="number"
-                id="durationWeeks"
-                name="durationWeeks"
-                value={formData.durationWeeks}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
             </div>
           </div>
         </div>
@@ -297,6 +268,29 @@ export default function ContractDetailsForm() {
                     <option key={year} value={year}>{year}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700">
+                  Is this a Local Contract Opportunity?
+                </label>
+                <select
+                  id="isLocalContract"
+                  name="isLocalContract"
+                  value={formData.isLocalContract}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    validationErrors.isLocalContract ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  required
+                >
+                  <option value="">Select</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                {validationErrors.isLocalContract && (
+                  <p className="text-sm text-red-600">{validationErrors.isLocalContract}</p>
+                )}
               </div>
             </div>
           </div>

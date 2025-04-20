@@ -97,22 +97,20 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
           </div>
         </div>
 
-        {/* Local Contract Notice */}
+        {/* Local Contract Notice - updated styling for better centering and cleaner appearance */}
         {scenarios[0].stipendBreakdown.isLocalContract && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 text-blue-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <div className="mt-4 p-6 bg-blue-50 border border-blue-200 rounded-lg text-center">
+            <div className="flex flex-col items-center justify-center">
+              <div className="flex-shrink-0 text-blue-500 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h4 className="text-sm font-medium text-blue-800">Local Contract Notice</h4>
-                <p className="mt-1 text-sm text-blue-700">
-                  This is a local contract opportunity. Only M&IE (Meals & Incidental Expenses) 
-                  stipends are included as lodging is not required.
-                </p>
-              </div>
+              <h4 className="text-sm font-medium text-blue-800">Local Contract Notice</h4>
+              <p className="mt-1 text-sm text-blue-700 max-w-md mx-auto">
+                This is a local contract opportunity. Only M&IE (Meals & Incidental Expenses) 
+                stipends are included as lodging is not required.
+              </p>
             </div>
           </div>
         )}
@@ -139,10 +137,12 @@ export default function PackageResults({ scenarios, stateMinimumWage, isLoading 
                 Option {index + 1}
               </h3>
               
-              {/* Margin that appears on hover */}
-              <div className="absolute right-4 top-4 bg-blue-800 text-white text-sm font-bold py-1 px-2 rounded-full 
+              {/* Margin bubble with two lines and better positioning */}
+              <div className="absolute top-4 right-4 bg-blue-800 text-white text-sm font-bold py-1 px-2 rounded-full 
+                flex flex-col items-center justify-center text-center w-16
                 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                {scenario.grossMarginPercent}% Margin
+                <span>{scenario.grossMarginPercent}%</span>
+                <span className="text-xs">Margin</span>
               </div>
             </div>
 
