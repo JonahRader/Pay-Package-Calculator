@@ -268,7 +268,7 @@ export default function ContractDetailsForm() {
                 </select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mt-[2px]">
                 <label htmlFor="year" className="block text-sm font-medium text-gray-700">
                   Year
                 </label>
@@ -287,7 +287,7 @@ export default function ContractDetailsForm() {
                 </select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 mt-[2px]">
                 <label htmlFor="isLocalContract" className="block text-sm font-medium text-gray-700">
                   Is this a Local Contract Opportunity?
                 </label>
